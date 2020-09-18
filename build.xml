@@ -3,7 +3,7 @@
     <property name="src.dir" value="src"/>
     <property name="temp.dir" value="temp"/>
     <property name="class.dir" value="${temp.dir}/classes"/>
-    <property name="main-class" value="io.siddhi.distribution.sample.http.server.HttpServerMain"/>
+    <property name="main-class" value="senatebusridersproblem.SenateBusRiders"/>
 
     <path id="javac.classpath">
     </path>
@@ -26,7 +26,7 @@
     </target>
 
     <target name="run" depends="compile">
-        <echo>Starting Snate-bus-riders-application</echo>
+        <echo>Starting Senate-bus-riders-application</echo>
         <java classname="${main-class}"
               classpathref="javac.classpath" fork="true">
         </java>
