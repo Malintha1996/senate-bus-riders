@@ -1,7 +1,9 @@
 ## senate-bus-riders
 Solution to Senate bus riders problem of synchronization using java.
-![alt text][]
 
+![screenshot1](resources/1.png)
+
+![screenshot2](resources/2.png)
 
 
 
@@ -12,7 +14,7 @@ Solution to Senate bus riders problem of synchronization using java.
     1. ['ant'](https://ant.apache.org/) installation
     2. jdk 1.8 or higher
 
-    In a terminal/shell go to the **project's root** directory and execute `ant` command
+    In a terminal/shell go to the **project's root** directory and execute `ant` command.
 
 2. Compile and run manually using java
     
