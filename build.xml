@@ -6,6 +6,7 @@
     <property name="main-class" value="senatebusridersproblem.SenateBusRiders"/>
 
     <path id="javac.classpath">
+        <pathelement path="${class.dir}"/>
     </path>
 
     <target name="clean">
@@ -26,7 +27,7 @@
     </target>
 
     <target name="run" depends="compile">
-        <echo>Starting Senate-bus-riders-application</echo>
+        <echo>Starting Senate-bus-riders-application........</echo>
         <java classname="${main-class}"
               classpathref="javac.classpath" fork="true">
         </java>

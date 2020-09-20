@@ -1,11 +1,10 @@
 package senatebusridersproblem;
 
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Bus extends Thread {
+    private final int BOARDING_LIMIT = 50;
     private static Logger logger = Logger.getLogger(Bus.class.getName());
-    private final int SEAT_LIMIT = 50;
 
     @Override
     public void run() {
@@ -14,38 +13,34 @@ public class Bus extends Thread {
 
     public void runImpl() {
         try {
-            SenateBusRiders.sharedVariables.getMutex().acquire();    //Bus waits to acquire riders mutex so that it can start boarding
-            //Riders cannot enter the bus stop, till the bus releases lock
-            System.out.println("Riders Queue mutex aquired by Bus "  +this.getId());
-        } catch (InterruptedException e) {
-            logger.log(Level.SEVERE, e.getMessage());
-        }
-        int boardingRidersCount = Math.min(SenateBusRiders.sharedVariables.getWaitingRidersCount().get(), SEAT_LIMIT);
-        System.out.format("\nRiders count in the Queue: %d\n",SenateBusRiders.sharedVariables.getWaitingRidersCount().get());
-        System.out.format("\nRiders count who can board: %d\n", boardingRidersCount);
-
-        for(int i=0; i < boardingRidersCount; i++){
-            SenateBusRiders.sharedVariables.getBus().release();      //signals each rider that they can get into the bus
-            System.out.println("Bus semaphore released by Bus " +this.getId());
-            try {
-                SenateBusRiders.sharedVariables.getBoarded().acquire();
-                /*
-                Bus aquires boarded semaphore to say rider has boarded
-                */
-                System.out.println("Boarded semaphore aquired by Bus " +this.getId());
-            } catch (InterruptedException e) {
-                logger.log(Level.SEVERE, e.getMessage());
+            /**
+             * Acquire the "mutex" so that only riders that had already arrived
+             * before the arrival of bus are able to board the bus.
+             */
+            SenateBusRiders.SHARED_RESOURCES.getMutex().acquire();
+            logger.info("Bus " + this.getId() +" arrived");
+            int boardingRidersCount = Math.min(SenateBusRiders.SHARED_RESOURCES.getWaitingRidersCount().get(), BOARDING_LIMIT);
+            for (int i = 0; i < boardingRidersCount; i++) {
+                //Signals each rider the boarding pass, now a rider who has  acquired the boarding pass(Bus semaphore) can board.
+                //System.out.println("Bus semaphore released by Bus " + this.getId());
+                SenateBusRiders.SHARED_RESOURCES.getBus().release();
+                //Wait for the rider to release the boarded semaphore.
+                SenateBusRiders.SHARED_RESOURCES.getBoarded().acquire();
+                //System.out.println("Boarded semaphore acquired by Bus " + this.getId());
             }
+            int n = SenateBusRiders.SHARED_RESOURCES.getWaitingRidersCount().get();
+            //Set the remaining riders as waitingRidersCount after all have boarded.
+            SenateBusRiders.SHARED_RESOURCES.getWaitingRidersCount().set(Math.max(n - 50, 0));
+            //release the boarding area entering pass(mutex)
+            SenateBusRiders.SHARED_RESOURCES.getMutex().release();
+            //System.out.println("Boarding area mutex released by Bus " + this.getId());
+            depart();
+        } catch (InterruptedException e) {
+            System.out.println(e.getMessage());
         }
-         /*
-        Updates the waiting riders count and relase the lock so that passengers can come to the bus stop.
-        Then the bus is fine to depart
-        */
-        int n = SenateBusRiders.sharedVariables.getWaitingRidersCount().get();
-        SenateBusRiders.sharedVariables.getWaitingRidersCount().set(Math.max(n - 50, 0));
-        SenateBusRiders.sharedVariables.getMutex().release();
+    }
 
-        System.out.println("Riders Queue mutex released by Bus "+this.getId());
-        System.out.println("Bus ["+this.getId()+"] Departs ");
+    void depart() {
+        logger.info("Bus " + this.getId() + " departs");
     }
 }

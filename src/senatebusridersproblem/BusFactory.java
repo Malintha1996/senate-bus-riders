@@ -1,11 +1,9 @@
 package senatebusridersproblem;
 
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class BusFactory extends Thread {
     private static Logger logger = Logger.getLogger(BusFactory.class.getName());
-
     @Override
     public void run() {
         this.produce();
@@ -13,14 +11,14 @@ public class BusFactory extends Thread {
 
     public void produce() {
         long produceInterval = 0;
-        while(true) {
-            produceInterval = (long) ( -(Math.log(Math.random()))*SenateBusRiders.BUS_ARRIVAL_TIME_MEAN);
-            System.out.println("Next bus arrives in " + produceInterval + " milliseconds");
+        while (true) {
+            produceInterval = (long) (-(Math.log(Math.random())) * SenateBusRiders.BUS_ARRIVAL_TIME_MEAN);
+            logger.info("Next bus arrives in " + produceInterval + " milliseconds");
             try {
-                Bus.sleep(produceInterval);
+                Thread.sleep(produceInterval);
                 new Bus().start();
             } catch (InterruptedException e) {
-                logger.log(Level.SEVERE,e.getMessage());
+                System.out.println(e.getMessage());
             }
         }
 
